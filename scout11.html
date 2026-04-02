@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scout11 · by Alex Cabrera</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --black: #0a0a0a;
+  --black2: #111111;
+  --black3: #1a1a1a;
+  --black4: #222222;
+  --gold: #c9a84c;
+  --gold2: #e6c96a;
+  --gold3: #f5e09a;
+  --gold-dim: rgba(201,168,76,.15);
+  --gold-border: rgba(201,168,76,.3);
+  --white: #ffffff;
+  --white-dim: rgba(255,255,255,.08);
+  --white-mid: rgba(255,255,255,.55);
+  --text: #f0ece0;
+  --text-muted: rgba(240,236,224,.55);
+  --text-dim: rgba(240,236,224,.3);
+  --green: #22c55e;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --surface: #161616;
+  --surface2: #1c1c1c;
+  --border: rgba(201,168,76,.18);
+  --shadow: 0 2px 12px rgba(0,0,0,.4);
+  --shadow-gold: 0 0 30px rgba(201,168,76,.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--black); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+/* ANIMATED BACKGROUND */
+.bg-anim {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,.07) 0%, transparent 70%);
+}
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(201,168,76,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridMove 20s linear infinite;
+}
+@keyframes gridMove { 0% { transform: translateY(0); } 100% { transform: translateY(60px); } }
+
+.particles {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.particle {
+  position: absolute; width: 2px; height: 2px; background: var(--gold); border-radius: 50%;
+  animation: float linear infinite; opacity: 0;
+}
+@keyframes float {
+  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10% { opacity: .6; }
+  90% { opacity: .3; }
+  100% { transform: translateY(-10vh) translateX(40px); opacity: 0; }
+}
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,10,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo-wrap { display: flex; align-items: center; gap: .8rem; }
+.logo-mark {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue'; font-size: 1rem; color: var(--black);
+  letter-spacing: 1px; flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(201,168,76,.3);
+}
+.logo-text { line-height: 1; }
+.logo-name { font-family: 'Bebas Neue'; font-size: 1.2rem; letter-spacing: 3px; color: var(--gold2); }
+.logo-by { font-size: .58rem; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; }
+.header-right { display: flex; align-items: center; gap: .7rem; }
+.trial-badge {
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  border-radius: 20px; padding: .2rem .75rem;
+  font-size: .62rem; color: var(--gold2); letter-spacing: .5px;
+}
+.btn-header {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--black); border: none; border-radius: 8px;
+  padding: .4rem 1rem; font-size: .75rem; font-weight: 700;
+  font-family: 'DM Sans'; cursor: pointer; letter-spacing: .3px;
+  transition: opacity .2s, transform .15s;
+}
+.btn-header:hover { opacity: .9; transform: translateY(-1px); }
+
+/* HERO */
+.hero {
+  position: relative; z-index: 1;
+  padding: 5rem 2rem 4rem;
+  text-align: center;
+  min-height: 480px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.hero-tag {
+  display: inline-block;
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  border-radius: 20px; padding: .3rem 1rem;
+  font-size: .68rem; color: var(--gold2); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 1.5rem;
+  animation: fadeUp .6s ease forwards;
+}
+.hero h1 {
+  font-family: 'Bebas Neue'; font-size: clamp(3rem, 7vw, 6rem);
+  letter-spacing: 6px; line-height: .95;
+  margin-bottom: 1rem;
+  animation: fadeUp .7s .1s ease both;
+}
+.hero h1 em { color: var(--gold2); font-style: normal; }
+.hero h1 span { color: var(--text-muted); }
+.hero-sub {
+  font-size: .95rem; color: var(--text-muted); max-width: 480px;
+  line-height: 1.65; margin-bottom: 2rem;
+  animation: fadeUp .7s .2s ease both;
+}
+.hero-actions {
+  display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp .7s .3s ease both;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--black); border: none; border-radius: 10px;
+  padding: .85rem 2rem; font-size: .9rem; font-weight: 700;
+  font-family: 'DM Sans'; cursor: pointer; letter-spacing: .3px;
+  box-shadow: 0 4px 20px rgba(201,168,76,.3);
+  transition: all .2s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(201,168,76,.4); }
+.btn-secondary {
+  background: transparent; color: var(--text-muted);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: .85rem 2rem; font-size: .9rem; font-weight: 500;
+  font-family: 'DM Sans'; cursor: pointer;
+  transition: all .2s;
+}
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold2); }
+
+.hero-features {
+  display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;
+  margin-top: 2.5rem;
+  animation: fadeUp .7s .4s ease both;
+}
+.hero-feat { display: flex; align-items: center; gap: .4rem; font-size: .75rem; color: var(--text-muted); }
+.hero-feat::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* DIVIDER */
+.divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* MAIN */
+main { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+/* AUTH WALL */
+.auth-wall {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 2rem;
+  box-shadow: var(--shadow-gold); margin-bottom: 2rem;
+  display: none;
+}
+.auth-wall.visible { display: block; }
+.auth-title { font-family: 'Bebas Neue'; font-size: 1.4rem; letter-spacing: 2px; color: var(--gold2); margin-bottom: .3rem; }
+.auth-sub { font-size: .8rem; color: var(--text-muted); margin-bottom: 1.2rem; line-height: 1.5; }
+.auth-form { display: flex; flex-direction: column; gap: .75rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+.field { display: flex; flex-direction: column; gap: .3rem; }
+.field label { font-size: .68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+.field input {
+  background: var(--black3); border: 1px solid var(--border);
+  border-radius: 8px; padding: .6rem .9rem;
+  color: var(--text); font-family: 'DM Sans'; font-size: .85rem;
+  outline: none; transition: border-color .2s;
+}
+.field input:focus { border-color: var(--gold); }
+.field input::placeholder { color: var(--text-dim); }
+.btn-auth {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--black); border: none; border-radius: 10px;
+  padding: .75rem; font-size: .88rem; font-weight: 700;
+  font-family: 'DM Sans'; cursor: pointer; width: 100%;
+  transition: opacity .2s; letter-spacing: .3px;
+}
+.btn-auth:hover { opacity: .9; }
+.auth-terms { font-size: .68rem; color: var(--text-dim); text-align: center; }
+.auth-terms em { color: var(--gold); font-style: normal; }
+.reg-step { margin-bottom: 1rem; }
+.reg-step-label { font-size: .68rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: .75rem; font-weight: 600; }
+.trial-info {
+  background: var(--gold-dim); border: 1px solid var(--gold-border);
+  border-radius: 10px; padding: .75rem 1rem;
+  font-size: .78rem; color: var(--gold2); line-height: 1.5; margin-bottom: .75rem;
+}
+
+/* APP */
+.app-section { display: none; }
+.app-section.visible { display: block; }
+
+/* STEPS CARD */
+.steps-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 1.5rem;
+  box-shadow: var(--shadow); margin-bottom: 1.5rem;
+}
+.sec-label {
+  font-size: .6rem; color: var(--gold); text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 1.2rem;
+  display: flex; align-items: center; gap: .5rem;
+}
+.sec-label::before { content: ''; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; }
+
+.step-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.4rem; }
+.step-row:last-child { margin-bottom: 0; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--black3); border: 1.5px solid rgba(201,168,76,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 600; color: var(--text-muted);
+  flex-shrink: 0; margin-top: 2px; transition: all .3s;
+}
+.step-num.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold2); }
+.step-num.done { background: rgba(34,197,94,.15); border-color: var(--green); color: var(--green); }
+.step-body { flex: 1; }
+.step-label { font-size: .85rem; font-weight: 600; color: var(--text); margin-bottom: .5rem; }
+
+/* TYPE SELECTOR */
+.type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: 1rem; }
+.type-card {
+  background: var(--black3); border: 1.5px solid var(--border);
+  border-radius: 12px; padding: 1rem;
+  cursor: pointer; transition: all .2s; text-align: center;
+}
+.type-card:hover { border-color: var(--gold); }
+.type-card.selected { background: var(--gold-dim); border-color: var(--gold); }
+.type-icon { font-size: 1.5rem; margin-bottom: .4rem; }
+.type-name { font-size: .85rem; font-weight: 600; color: var(--text); margin-bottom: .2rem; }
+.type-desc { font-size: .68rem; color: var(--text-muted); line-height: 1.4; }
+.type-card.selected .type-name { color: var(--gold2); }
+
+/* DROP ZONE */
+.drop-zone {
+  border: 2px dashed rgba(201,168,76,.25); border-radius: 12px;
+  padding: 2rem; text-align: center; cursor: pointer;
+  background: var(--black3); transition: all .2s;
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--gold); background: var(--gold-dim);
+}
+.drop-icon { font-size: 2rem; margin-bottom: .6rem; }
+.drop-title { font-size: .88rem; font-weight: 600; color: var(--text); margin-bottom: .2rem; }
+.drop-sub { font-size: .72rem; color: var(--text-muted); }
+.file-ok { font-size: .78rem; color: var(--green); margin-top: .5rem; font-weight: 500; }
+.col-hint { font-size: .68rem; color: var(--text-dim); margin-top: .3rem; }
+.error-msg { font-size: .75rem; color: var(--red); margin-top: .5rem; }
+
+/* FILTERS */
+.filters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin-bottom: .75rem; }
+.filter-block { display: flex; flex-direction: column; gap: 4px; }
+.filter-label { font-size: .62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+.filter-block input, .filter-block select {
+  background: var(--black3); border: 1px solid var(--border);
+  border-radius: 8px; padding: .45rem .75rem;
+  color: var(--text); font-family: 'DM Sans'; font-size: .82rem;
+  outline: none; transition: border-color .2s;
+}
+.filter-block input:focus, .filter-block select:focus { border-color: var(--gold); }
+.filter-block select option { background: var(--black3); }
+
+.results-count { font-size: .68rem; color: var(--text-dim); margin-bottom: .4rem; }
+.player-list {
+  border: 1px solid var(--border); border-radius: 10px;
+  max-height: 240px; overflow-y: auto; background: var(--black2);
+}
+.player-list::-webkit-scrollbar { width: 4px; }
+.player-list::-webkit-scrollbar-track { background: transparent; }
+.player-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.player-row {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .6rem 1rem; border-bottom: 1px solid rgba(201,168,76,.08);
+  cursor: pointer; transition: background .12s;
+}
+.player-row:last-child { border-bottom: none; }
+.player-row:hover { background: rgba(255,255,255,.03); }
+.player-row.selected { background: var(--gold-dim); }
+.player-check {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid rgba(201,168,76,.3);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: .65rem; transition: all .15s;
+}
+.player-row.selected .player-check { background: var(--gold); border-color: var(--gold); color: var(--black); }
+.player-name-cell { font-size: .82rem; font-weight: 500; color: var(--text); }
+.player-row.selected .player-name-cell { color: var(--gold2); }
+.player-meta-cell { font-size: .65rem; color: var(--text-dim); margin-top: 1px; }
+.no-results { padding: 1.5rem; text-align: center; font-size: .8rem; color: var(--text-dim); }
+
+.selected-chips { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .65rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .68rem; padding: .2rem .6rem;
+  border-radius: 20px; background: var(--gold-dim);
+  border: 1px solid var(--gold-border); color: var(--gold2); font-weight: 500;
+}
+.chip-x { cursor: pointer; opacity: .6; font-size: .8rem; transition: opacity .15s; }
+.chip-x:hover { opacity: 1; }
+
+/* GENERATE */
+.btn-generate {
+  width: 100%; padding: .9rem;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--black); border: none; border-radius: 10px;
+  font-family: 'DM Sans'; font-size: .9rem; font-weight: 700;
+  cursor: pointer; letter-spacing: .3px;
+  box-shadow: 0 4px 20px rgba(201,168,76,.25);
+  transition: all .2s;
+}
+.btn-generate:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(201,168,76,.35); }
+.btn-generate:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+.spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(0,0,0,.25); border-top-color: var(--black); border-radius: 50%; animation: spin .7s linear infinite; margin-right: .5rem; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* REPORTS */
+.reports-section { margin-top: 1.5rem; }
+.report-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  box-shadow: var(--shadow-gold); margin-bottom: 1.5rem;
+  animation: fadeUp .4s ease forwards;
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+.report-header {
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+  border-bottom: 1px solid var(--border);
+  padding: 1.3rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+  position: relative; overflow: hidden;
+}
+.report-header::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold2), var(--gold));
+}
+.report-avatar {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 700; color: var(--black); flex-shrink: 0;
+  box-shadow: 0 0 16px rgba(201,168,76,.3);
+}
+.report-player-name { font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 2px; color: var(--text); }
+.report-player-meta { font-size: .72rem; color: var(--text-muted); margin-top: .1rem; }
+.report-pos-badge {
+  display: inline-block; background: var(--gold-dim);
+  border: 1px solid var(--gold-border); border-radius: 20px;
+  padding: .12rem .65rem; font-size: .6rem; font-weight: 600;
+  color: var(--gold2); letter-spacing: .5px; margin-top: .35rem;
+}
+.report-type-badge {
+  margin-left: auto; font-size: .62rem; color: var(--text-dim);
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px; padding: .15rem .65rem; flex-shrink: 0;
+}
+
+.report-body { padding: 1.2rem 1.5rem; }
+
+/* ALERTAS */
+.alertas { display: flex; flex-direction: column; gap: .45rem; margin-bottom: 1.2rem; }
+.alerta { display: flex; align-items: flex-start; gap: .6rem; padding: .65rem .9rem; border-radius: 9px; font-size: .77rem; line-height: 1.45; }
+.alerta.rojo { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); color: #fca5a5; }
+.alerta.verde { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25); color: #86efac; }
+.alerta.amber { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25); color: #fcd34d; }
+.alerta-icon { flex-shrink: 0; font-size: .88rem; margin-top: 1px; }
+.alerta-title { font-weight: 700; margin-bottom: .1rem; }
+
+/* KPI */
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .55rem; margin-bottom: 1.2rem; }
+.kpi-box { background: var(--black3); border: 1px solid var(--border); border-radius: 10px; padding: .8rem .6rem; text-align: center; }
+.kpi-val { font-family: 'Bebas Neue'; font-size: 1.9rem; color: var(--gold2); line-height: 1; }
+.kpi-lbl { font-size: .55rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-top: .15rem; }
+.kpi-sub { font-size: .6rem; color: var(--text-dim); margin-top: .1rem; }
+
+/* CHARTS */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-bottom: 1.2rem; }
+.chart-box { background: var(--black3); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+.chart-box-title { font-size: .6rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: .7rem; display: flex; align-items: center; gap: .4rem; }
+.chart-box-title::before { content: ''; width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }
+.chart-wrap { position: relative; height: 175px; }
+
+/* PROYECCION */
+.proyeccion-box {
+  background: linear-gradient(135deg, rgba(34,197,94,.08), rgba(34,197,94,.04));
+  border: 1px solid rgba(34,197,94,.2); border-radius: 12px;
+  padding: 1rem; margin-bottom: 1.2rem;
+}
+.proyeccion-title { font-size: .6rem; color: #86efac; text-transform: uppercase; letter-spacing: 1px; margin-bottom: .7rem; display: flex; align-items: center; gap: .4rem; font-weight: 600; }
+.proyeccion-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: .45rem; }
+.proy-item { background: rgba(0,0,0,.3); border-radius: 8px; padding: .6rem; text-align: center; border: 1px solid rgba(34,197,94,.12); }
+.proy-val { font-family: 'Bebas Neue'; font-size: 1.5rem; color: #4ade80; line-height: 1; }
+.proy-lbl { font-size: .55rem; color: #86efac; text-transform: uppercase; letter-spacing: .3px; margin-top: .1rem; }
+.proy-note { font-size: .63rem; color: rgba(134,239,172,.6); margin-top: .55rem; font-style: italic; }
+
+/* SCATTER */
+.scatter-box { background: var(--black3); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin-bottom: 1.2rem; }
+.scatter-controls { display: flex; gap: .6rem; margin-bottom: .65rem; flex-wrap: wrap; align-items: center; }
+.scatter-controls label { font-size: .68rem; color: var(--text-muted); display: flex; align-items: center; gap: .3rem; }
+.scatter-controls select {
+  background: var(--black2); border: 1px solid var(--border);
+  border-radius: 6px; padding: .25rem .55rem;
+  color: var(--text); font-size: .72rem; outline: none;
+}
+.scatter-wrap { position: relative; height: 210px; }
+
+/* TEXTO IA */
+.texto-box { background: var(--black3); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+.texto-box-title { font-size: .6rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: .7rem; display: flex; align-items: center; gap: .4rem; }
+.texto-box-title::before { content: ''; width: 5px; height: 5px; background: var(--gold); border-radius: 50%; }
+.texto-ia { font-size: .82rem; line-height: 1.78; color: var(--text); white-space: pre-wrap; }
+.texto-loading { font-size: .78rem; color: var(--text-muted); font-style: italic; }
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 2rem; text-align: center;
+}
+.footer-logo { font-family: 'Bebas Neue'; font-size: 1.1rem; letter-spacing: 3px; color: var(--gold2); margin-bottom: .3rem; }
+.footer-by { font-size: .68rem; color: var(--text-dim); }
+.footer-by a { color: var(--gold); text-decoration: none; }
+.footer-by a:hover { text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+  .filters-grid { grid-template-columns: 1fr; }
+  .proyeccion-grid { grid-template-columns: repeat(2,1fr); }
+  .form-row { grid-template-columns: 1fr; }
+  .type-selector { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ANIMATED BG -->
+<div class="bg-anim"></div>
+<div class="bg-grid"></div>
+<div class="particles" id="particles"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-mark">S11</div>
+    <div class="logo-text">
+      <div class="logo-name">Scout11</div>
+      <div class="logo-by">by Alex Cabrera</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="trial-badge" id="trialBadge">7 días gratis</div>
+    <button class="btn-header" id="loginBtn" onclick="showLogin()" style="background:transparent;border:1px solid rgba(201,168,76,.4);color:var(--gold2);margin-right:.4rem;">Iniciar sesión</button>
+    <button class="btn-header" id="headerBtn" onclick="showAuth()">Empezar gratis</button>
+  </div>
+</header>
+
+<!-- LANDING -->
+<div id="landingPage">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">La decisión que no puedes permitirte retrasar</div>
+  <h1>Informes de scouting<br><em>en segundos</em></h1>
+  <p class="hero-sub">Lo que antes costaba horas de trabajo manual — o el sueldo de un analista — ahora lo tienes en menos de 60 segundos. Toma mejores decisiones. Antes que tu competencia.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="showAuth()">Empezar gratis — 7 días</button>
+    <button class="btn-secondary" onclick="document.getElementById('como-funciona').scrollIntoView({behavior:'smooth'})">Ver cómo funciona</button>
+  </div>
+  <div class="hero-features">
+    <span class="hero-feat">Sin analista. Sin esperas</span>
+    <span class="hero-feat">Visualización interactiva</span>
+    <span class="hero-feat">Alertas inteligentes</span>
+    <span class="hero-feat">Proyección de temporada</span>
+    <span class="hero-feat">Comparativa de jugadores</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- COMO FUNCIONA -->
+<div id="como-funciona" style="position:relative;z-index:1;max-width:860px;margin:0 auto;padding:3rem 1.5rem 2rem;">
+  <div style="text-align:center;margin-bottom:2rem;">
+    <div style="font-size:.65rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:.6rem;">Así de sencillo</div>
+    <div style="font-family:'Bebas Neue';font-size:2rem;letter-spacing:3px;color:var(--text);">Cómo funciona Scout11</div>
+    <div style="font-size:.82rem;color:var(--text-muted);margin-top:.5rem;">Tres pasos. Menos de un minuto. El fichaje que se te escapó el mes pasado no volverá a escaparse.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:.7rem;">📂</div>
+      <div style="font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:1px;color:var(--gold2);margin-bottom:.4rem;">1. Sube el archivo</div>
+      <div style="font-size:.78rem;color:var(--text-muted);line-height:1.5;">Excel o CSV con los jugadores. El mismo archivo que ya tienes en tu ordenador.</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:.7rem;">🎯</div>
+      <div style="font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:1px;color:var(--gold2);margin-bottom:.4rem;">2. Selecciona jugadores</div>
+      <div style="font-size:.78rem;color:var(--text-muted);line-height:1.5;">Filtra por posición, club o edad. Elige uno o varios en segundos.</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+      <div style="font-size:1.8rem;margin-bottom:.7rem;">⚡</div>
+      <div style="font-family:'Bebas Neue';font-size:1.1rem;letter-spacing:1px;color:var(--gold2);margin-bottom:.4rem;">3. Informe al instante</div>
+      <div style="font-size:.78rem;color:var(--text-muted);line-height:1.5;">Gráficos, alertas, análisis IA y proyección de temporada. Profesional. Inmediato.</div>
+    </div>
+  </div>
+  <!-- SOCIAL PROOF -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.5rem;display:flex;align-items:center;gap:1.2rem;">
+    <div style="font-size:1.5rem;flex-shrink:0;">💡</div>
+    <div>
+      <div style="font-size:.8rem;color:var(--text);font-weight:600;margin-bottom:.2rem;">¿Cuánto cuesta un scout o analista?</div>
+      <div style="font-size:.75rem;color:var(--text-muted);line-height:1.5;">Entre 600€ y 800€/mes — y te hace un informe cada vez que le pides, uno a uno. Scout11 te genera todos los que necesites en segundos, sin esperas y sin límite.</div>
+    </div>
+  </div>
+</div><!-- end como-funciona -->
+
+<hr class="divider">
+
+<main id="demo">
+
+  <!-- AUTH inside landing -->
+  <div id="authContainer">
+
+  <!-- AUTH -->
+  <div class="auth-wall" id="authWall">
+    <div class="auth-title">Empieza gratis hoy</div>
+    <div class="auth-sub">7 días para ver lo que te estabas perdiendo.<br>Sin tarjeta. Sin compromiso.</div>
+    <div style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:.7rem 1rem;margin-bottom:.75rem;font-size:.85rem;color:var(--gold2);font-weight:600;text-align:center;">
+      😅 Tranquilo, no van a ser 100€ al mes.
+    </div>
+
+    <div class="trial-info">
+      ⚡ <strong>Promoción de lanzamiento</strong> — Acceso gratuito por tiempo limitado.<br>
+      Cada día sin datos es un día tomando decisiones a ciegas.
+    </div>
+
+    <!-- STEP 1: TIPO -->
+    <div class="reg-step" id="regStep1">
+      <div class="reg-step-label">Paso 1 · ¿Eres un club o una agencia de representación?</div>
+      <div class="type-selector" style="margin-bottom:0">
+        <div class="type-card" id="reg-type-club" onclick="selectRegType('club')">
+          <div class="type-icon">🏟️</div>
+          <div class="type-name">Club de fútbol</div>
+          <div class="type-desc">Análisis de plantilla y scouting de fichajes</div>
+        </div>
+        <div class="type-card" id="reg-type-agencia" onclick="selectRegType('agencia')">
+          <div class="type-icon">🤝</div>
+          <div class="type-name">Agencia de representación</div>
+          <div class="type-desc">Gestión y negociación de contratos</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: DATOS -->
+    <div class="reg-step" id="regStep2" style="display:none;">
+      <div class="reg-step-label">Paso 2 · Tus datos de contacto <span style="color:var(--text-dim);font-size:.6rem;text-transform:none;letter-spacing:0;">— Todos los campos son obligatorios</span></div>
+      <div class="auth-form" id="authForm">
+        <div class="form-row">
+          <div class="field">
+            <label>Nombre completo <span style="color:var(--gold)">*</span></label>
+            <input type="text" id="authNombre" placeholder="Tu nombre y apellidos" required>
+          </div>
+          <div class="field">
+            <label>Email <span style="color:var(--gold)">*</span></label>
+            <input type="email" id="authEmail" placeholder="tu@email.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Teléfono <span style="color:var(--gold)">*</span></label>
+            <div style="display:flex;gap:.4rem;">
+              <input type="text" id="authPrefix" placeholder="+34" style="width:75px;flex-shrink:0;" required>
+              <input type="tel" id="authTelefono" placeholder="600 000 000" style="flex:1;" required>
+            </div>
+          </div>
+          <div class="field">
+            <label id="orgLabel">Nombre del club <span style="color:var(--gold)">*</span></label>
+            <input type="text" id="authOrg" placeholder="Nombre del club o agencia" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Contraseña <span style="color:var(--gold)">*</span></label>
+            <input type="password" id="authPassword" placeholder="Mínimo 6 caracteres" required>
+          </div>
+          <div class="field">
+            <label>Repite la contraseña <span style="color:var(--gold)">*</span></label>
+            <input type="password" id="authPassword2" placeholder="Repite tu contraseña" required>
+          </div>
+        </div>
+        <button class="btn-auth" onclick="startTrial()">Activar prueba gratuita — 7 días →</button>
+        <div class="auth-terms">Sin coste durante 7 días. Al registrarte aceptas los <em>términos de uso</em>.<br>Recibirás un email de confirmación. Cancela cuando quieras.</div>
+      </div>
+    </div>
+
+    <div id="authSuccess" style="display:none;text-align:center;padding:1.5rem 0;">
+      <div style="font-size:2rem;margin-bottom:.7rem;">✅</div>
+      <div style="font-family:'Bebas Neue';font-size:1.3rem;letter-spacing:2px;color:var(--gold2);margin-bottom:.4rem;">¡Registro completado!</div>
+      <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:.5rem;">Bienvenido a Scout11. Tu prueba gratuita de 7 días está activa.</div>
+      <div style="font-size:.75rem;color:var(--text-dim);margin-bottom:1.2rem;">Tienes 7 días para descubrir lo que estabas perdiendo.</div>
+      <button class="btn-auth" onclick="openApp()">Acceder a la herramienta →</button>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="auth-wall" id="loginWall" style="display:none;">
+    <div class="auth-title">Bienvenido de nuevo</div>
+    <div class="auth-sub">Introduce tu email para acceder a Scout11.</div>
+    <div class="auth-form">
+      <div class="field">
+        <label>Email <span style="color:var(--gold)">*</span></label>
+        <input type="email" id="loginEmail" placeholder="tu@email.com" required>
+      </div>
+      <div class="field">
+        <label>Contraseña <span style="color:var(--gold)">*</span></label>
+        <input type="password" id="loginPassword" placeholder="Tu contraseña" required>
+      </div>
+      <button class="btn-auth" onclick="doLogin()">Acceder →</button>
+      <div style="text-align:center;margin-top:.6rem;">
+        <span style="font-size:.72rem;color:var(--text-dim);">¿Primera vez? </span>
+        <span style="font-size:.72rem;color:var(--gold);cursor:pointer;" onclick="showRegister()">Regístrate gratis →</span>
+      </div>
+    </div>
+  </div><!-- end loginWall -->
+
+  </div><!-- end authContainer / landingPage -->
+
+  <!-- APP PAGE - shown after login/register -->
+  <div id="appPage" style="display:none;">
+  <!-- APP -->
+  <div class="app-section" id="appSection">
+
+    <div style="background:var(--gold-dim);border:1px solid var(--gold-border);border-radius:12px;padding:.85rem 1.1rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem;">
+      <span style="font-size:1rem;flex-shrink:0;">🎯</span>
+      <div>
+        <span style="font-size:.78rem;color:var(--gold2);font-weight:600;">Prueba gratuita activa — 7 días.</span>
+        <span style="font-size:.75rem;color:var(--text-muted);"> Mientras tú lees esto, alguien está tomando decisiones con datos. ¿Y tú?</span>
+      </div>
+    </div>
+
+    <div class="steps-card">
+      <div class="sec-label">Genera tu informe en 3 pasos</div>
+
+      <!-- STEP 0: TIPO -->
+      <div class="step-row">
+        <div class="step-num active" id="num0">0</div>
+        <div class="step-body">
+          <div class="step-label">¿Para quién es el informe?</div>
+          <div class="type-selector">
+            <div class="type-card" id="type-club" onclick="selectType('club')">
+              <div class="type-icon">🏟️</div>
+              <div class="type-name">Club de fútbol</div>
+              <div class="type-desc">Análisis de plantilla propia o scouting de fichajes</div>
+            </div>
+            <div class="type-card" id="type-agencia" onclick="selectType('agencia')">
+              <div class="type-icon">🤝</div>
+              <div class="type-name">Agencia de representación</div>
+              <div class="type-desc">Gestión y negociación de contratos de jugadores</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step-row" id="step1" style="opacity:.4;pointer-events:none;">
+        <div class="step-num" id="num1">1</div>
+        <div class="step-body">
+          <div class="step-label">Sube el archivo con los jugadores</div>
+          <div class="drop-zone" id="dropzone"
+            onclick="document.getElementById('fileInput').click()"
+            ondragover="onDrag(event,true)"
+            ondragleave="onDrag(event,false)"
+            ondrop="onDrop(event)">
+            <div class="drop-icon">📂</div>
+            <div class="drop-title">Haz clic o arrastra el archivo aquí</div>
+            <div class="drop-sub">Formatos: .xlsx · .xls · .csv</div>
+          </div>
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="loadFile(event)">
+          <div class="file-ok" id="fileOk" style="display:none"></div>
+          <div class="col-hint" id="colHint" style="display:none"></div>
+          <div class="error-msg" id="fileError"></div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-row" id="step2" style="opacity:.4;pointer-events:none;">
+        <div class="step-num" id="num2">2</div>
+        <div class="step-body">
+          <div class="step-label">Filtra y selecciona los jugadores a analizar</div>
+          <div class="filters-grid">
+            <div class="filter-block">
+              <span class="filter-label">Por nombre</span>
+              <input type="text" id="fNombre" placeholder="Buscar nombre..." oninput="applyFilters()">
+            </div>
+            <div class="filter-block">
+              <span class="filter-label">Por posición</span>
+              <select id="fPosicion" onchange="applyFilters()"><option value="">Todas</option></select>
+            </div>
+            <div class="filter-block">
+              <span class="filter-label">Por club / equipo</span>
+              <select id="fClub" onchange="applyFilters()"><option value="">Todos</option></select>
+            </div>
+            <div class="filter-block">
+              <span class="filter-label">Por edad</span>
+              <select id="fEdad" onchange="applyFilters()">
+                <option value="">Cualquier edad</option>
+                <option value="sub18">Sub-18</option>
+                <option value="18-23">18 – 23</option>
+                <option value="24-29">24 – 29</option>
+                <option value="30+">30+</option>
+              </select>
+            </div>
+          </div>
+          <div class="results-count" id="resultsCount"></div>
+          <div class="player-list" id="playerList"></div>
+          <div class="selected-chips" id="selectedChips"></div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-row" id="step3" style="opacity:.4;pointer-events:none;">
+        <div class="step-num" id="num3">3</div>
+        <div class="step-body">
+          <div class="step-label">Genera los informes con IA</div>
+          <button class="btn-generate" id="btnGen" onclick="generarInformes()" disabled>
+            Generar informes con IA
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="reports-section" id="reportsSection"></div>
+  </div>
+  </div><!-- end appPage -->
+
+</main>
+
+<footer>
+  <div class="footer-logo">Scout11</div>
+  <div class="footer-by">Creado por <a href="https://linkedin.com" target="_blank">Alex Cabrera</a> · Inteligencia artificial aplicada al fútbol</div>
+</footer>
+
+<script>
+// INIT — check if already registered
+(function() {
+  const saved = localStorage.getItem('scout11_registered');
+  if (saved) {
+    const btn = document.getElementById('headerBtn');
+    if (btn) btn.textContent = 'Registrarse';
+  }
+})();
+
+// PARTICLES
+(function() {
+  const c = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.animationDuration = (8 + Math.random() * 14) + 's';
+    p.style.animationDelay = (Math.random() * 12) + 's';
+    p.style.width = p.style.height = (Math.random() > .5 ? 2 : 3) + 'px';
+    p.style.opacity = '0';
+    c.appendChild(p);
+  }
+})();
+
+// STATE
+let allPlayers = [], selectedPlayers = new Set(), playerData = {}, cols = [];
+let currentType = '', scatterInstances = {};
+
+const COL_KEYS = {
+  nombre:      ['nombre','name','jugador','player','apellido'],
+  posicion:    ['posicion','posición','position','pos','demarcacion'],
+  club:        ['club','equipo','team','squad'],
+  edad:        ['edad','age','anos','años'],
+  minutos:     ['minutos','minutes','min'],
+  partidos:    ['partidos','pj','matches','games'],
+  titular:     ['titular','tit','started'],
+  suplente:    ['suplente','sup'],
+  goles:       ['goles','goals','gol'],
+  asistencias: ['asistencias','asist','assists'],
+  amarillas:   ['amarillas','amarilla','yellow'],
+  rojas:       ['rojas','roja','red']
+};
+
+function normalize(s) {
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+function findCol(keys) {
+  return cols.find(c => keys.some(k => normalize(c).includes(k))) || '';
+}
+
+// AUTH
+function updatePrefix() {}
+
+let regType = '';
+function showAuth() {
+  const saved = localStorage.getItem('scout11_registered');
+  if (saved) {
+    document.getElementById('loginWall').style.display = 'block';
+    document.getElementById('loginWall').scrollIntoView({ behavior:'smooth', block:'center' });
+  } else {
+    document.getElementById('authWall').classList.add('visible');
+    document.getElementById('authWall').scrollIntoView({ behavior:'smooth', block:'center' });
+  }
+}
+function showRegister() {
+  document.getElementById('loginWall').style.display = 'none';
+  document.getElementById('authWall').classList.add('visible');
+  document.getElementById('authWall').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!email || !password) { alert('Por favor introduce tu email y contraseña.'); return; }
+  const saved = localStorage.getItem('scout11_registered');
+  if (saved) {
+    const user = JSON.parse(saved);
+    if (user.email === email && user.pwd === btoa(password)) {
+      document.getElementById('loginWall').style.display = 'none';
+      openApp();
+    } else {
+      alert('Email o contraseña incorrectos.');
+    }
+  } else {
+    alert('No encontramos tu cuenta. ¿Ya te has registrado?');
+  }
+}
+function selectRegType(type) {
+  regType = type;
+  document.getElementById('reg-type-club').classList.toggle('selected', type === 'club');
+  document.getElementById('reg-type-agencia').classList.toggle('selected', type === 'agencia');
+  document.getElementById('orgLabel').innerHTML = (type === 'club' ? 'Nombre del club' : 'Nombre de la agencia') + ' <span style="color:var(--gold)">*</span>';
+  document.getElementById('regStep2').style.display = 'block';
+  setTimeout(() => document.getElementById('regStep2').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
+async function startTrial() {
+  const nombre = document.getElementById('authNombre').value.trim();
+  const email = document.getElementById('authEmail').value.trim();
+  const prefix = document.getElementById('authPrefix').value.trim();
+  const telefono = document.getElementById('authTelefono').value.trim();
+  const org = document.getElementById('authOrg').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const password2 = document.getElementById('authPassword2').value;
+  if (!regType) { alert('Por favor selecciona si eres club o agencia.'); return; }
+  if (!nombre || !email || !prefix || !telefono || !org || !password) { alert('Por favor completa todos los campos obligatorios.'); return; }
+  if (password.length < 6) { alert('La contraseña debe tener al menos 6 caracteres.'); return; }
+  if (password !== password2) { alert('Las contraseñas no coinciden.'); return; }
+  const telefonoCompleto = prefix + ' ' + telefono;
+  const btn = document.querySelector('#authForm .btn-auth');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+  try {
+    const res = await fetch('https://formspree.io/f/xeeployv', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ tipo: regType === 'club' ? 'Club de fútbol' : 'Agencia de representación', nombre, email, telefono: telefonoCompleto, organizacion: org })
+    });
+    if (res.ok) {
+      document.getElementById('authForm').style.display = 'none';
+      document.getElementById('regStep1').style.display = 'none';
+      document.querySelectorAll('.reg-step-label').forEach(e => e.style.display = 'none');
+      document.getElementById('authSuccess').style.display = 'block';
+      localStorage.setItem('scout11_registered', JSON.stringify({ nombre, email, tipo: regType, org, pwd: btoa(password) }));
+      sessionStorage.setItem('scout11_user', JSON.stringify({ nombre, email, tipo: regType, org }));
+    } else { throw new Error('Error al enviar'); }
+  } catch(err) {
+    alert('Hubo un problema al registrarte. Inténtalo de nuevo.');
+    btn.disabled = false; btn.textContent = 'Activar prueba gratuita — 7 días →';
+  }
+}
+function showLogin() {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('authContainer').style.display = 'block';
+  document.getElementById('loginWall').style.display = 'block';
+  document.getElementById('authWall').classList.remove('visible');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function openApp() {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('authContainer').style.display = 'none';
+  document.getElementById('appPage').style.display = 'block';
+  document.getElementById('appSection').classList.add('visible');
+  document.getElementById('trialBadge').style.display = 'none';
+  document.getElementById('headerBtn').style.display = 'none';
+  document.getElementById('loginBtn').textContent = 'Cerrar sesión';
+  document.getElementById('loginBtn').onclick = function() { localStorage.removeItem('scout11_registered'); location.reload(); };
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// TYPE SELECTOR
+function selectType(type) {
+  currentType = type;
+  document.getElementById('type-club').classList.toggle('selected', type === 'club');
+  document.getElementById('type-agencia').classList.toggle('selected', type === 'agencia');
+  document.getElementById('num0').textContent = '✓';
+  document.getElementById('num0').className = 'step-num done';
+  const s1 = document.getElementById('step1');
+  s1.style.opacity = '1'; s1.style.pointerEvents = 'auto';
+  document.getElementById('num1').className = 'step-num active';
+}
+
+// FILE
+function onDrag(e, over) { e.preventDefault(); document.getElementById('dropzone').classList.toggle('dragover', over); }
+function onDrop(e) { e.preventDefault(); document.getElementById('dropzone').classList.remove('dragover'); if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); }
+function loadFile(e) { if (e.target.files[0]) processFile(e.target.files[0]); }
+
+function processFile(file) {
+  document.getElementById('fileError').textContent = '';
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const ext = file.name.split('.').pop().toLowerCase();
+      let rows;
+      if (ext === 'csv') {
+        const text = new TextDecoder('utf-8').decode(new Uint8Array(e.target.result));
+        const wb = XLSX.read(text, { type: 'string' });
+        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+      } else {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+      }
+      if (!rows.length) { document.getElementById('fileError').textContent = 'El archivo está vacío.'; return; }
+      cols = Object.keys(rows[0]);
+      const nameC = findCol(COL_KEYS.nombre) || cols[0];
+      const posC = findCol(COL_KEYS.posicion);
+      const clubC = findCol(COL_KEYS.club);
+      const edadC = findCol(COL_KEYS.edad);
+      allPlayers = []; playerData = {};
+      const posSet = new Set(), clubSet = new Set();
+      rows.forEach(row => {
+        const n = String(row[nameC] || '').trim();
+        if (!n) return;
+        const pos = String(row[posC] || '').trim();
+        const club = String(row[clubC] || '').trim();
+        const edad = parseInt(row[edadC]) || 0;
+        allPlayers.push(n);
+        playerData[n] = { _raw: row, posicion: pos, club, edad, _norm: normalize(n) };
+        if (pos) posSet.add(pos);
+        if (club) clubSet.add(club);
+      });
+      if (!allPlayers.length) { document.getElementById('fileError').textContent = 'No se encontraron jugadores.'; return; }
+      const posEl = document.getElementById('fPosicion');
+      posEl.innerHTML = '<option value="">Todas</option>';
+      [...posSet].sort().forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; posEl.appendChild(o); });
+      const clubEl = document.getElementById('fClub');
+      clubEl.innerHTML = '<option value="">Todos</option>';
+      [...clubSet].sort().forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; clubEl.appendChild(o); });
+      document.getElementById('fileOk').style.display = 'block';
+      document.getElementById('fileOk').textContent = `✓ ${file.name} — ${allPlayers.length} jugadores encontrados`;
+      document.getElementById('colHint').style.display = 'block';
+      document.getElementById('colHint').textContent = `Columnas: ${cols.slice(0,8).join(', ')}${cols.length > 8 ? '...' : ''}`;
+      document.getElementById('num1').textContent = '✓';
+      document.getElementById('num1').className = 'step-num done';
+      const s2 = document.getElementById('step2');
+      s2.style.opacity = '1'; s2.style.pointerEvents = 'auto';
+      document.getElementById('num2').className = 'step-num active';
+      applyFilters();
+    } catch(err) {
+      document.getElementById('fileError').textContent = 'Error al leer el archivo: ' + err.message;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// FILTERS
+function applyFilters() {
+  const nombre = normalize(document.getElementById('fNombre').value);
+  const posicion = document.getElementById('fPosicion').value;
+  const club = document.getElementById('fClub').value;
+  const edad = document.getElementById('fEdad').value;
+  const filtered = allPlayers.filter(n => {
+    const d = playerData[n];
+    if (nombre && !d._norm.includes(nombre)) return false;
+    if (posicion && d.posicion !== posicion) return false;
+    if (club && d.club !== club) return false;
+    if (edad) {
+      const e = d.edad;
+      if (edad === 'sub18' && e >= 18) return false;
+      if (edad === '18-23' && (e < 18 || e > 23)) return false;
+      if (edad === '24-29' && (e < 24 || e > 29)) return false;
+      if (edad === '30+' && e < 30) return false;
+    }
+    return true;
+  });
+  document.getElementById('resultsCount').textContent = `${filtered.length} jugador${filtered.length !== 1 ? 'es' : ''} encontrado${filtered.length !== 1 ? 's' : ''}`;
+  const list = document.getElementById('playerList');
+  if (!filtered.length) { list.innerHTML = '<div class="no-results">Sin resultados para este filtro</div>'; return; }
+  list.innerHTML = '';
+  filtered.slice(0, 60).forEach(name => {
+    const d = playerData[name];
+    const meta = [d.posicion, d.club, d.edad ? d.edad + ' años' : ''].filter(Boolean).join(' · ');
+    const row = document.createElement('div');
+    row.className = 'player-row' + (selectedPlayers.has(name) ? ' selected' : '');
+    row.innerHTML = `<div class="player-check">${selectedPlayers.has(name) ? '✓' : ''}</div><div style="flex:1"><div class="player-name-cell">${name}</div>${meta ? '<div class="player-meta-cell">' + meta + '</div>' : ''}</div>`;
+    row.onclick = () => { togglePlayer(name); };
+    list.appendChild(row);
+  });
+  if (filtered.length > 60) {
+    const m = document.createElement('div');
+    m.className = 'no-results';
+    m.textContent = `Mostrando 60 de ${filtered.length}. Usa los filtros para afinar.`;
+    list.appendChild(m);
+  }
+}
+function togglePlayer(name) { if (selectedPlayers.has(name)) selectedPlayers.delete(name); else selectedPlayers.add(name); applyFilters(); renderChips(); updateStep3(); }
+function renderChips() {
+  const c = document.getElementById('selectedChips'); c.innerHTML = '';
+  selectedPlayers.forEach(name => { const chip = document.createElement('span'); chip.className = 'chip'; chip.innerHTML = `${name} <span class="chip-x" onclick="removePlayer('${name.replace(/'/g,"\\'")}')">×</span>`; c.appendChild(chip); });
+}
+function removePlayer(name) { selectedPlayers.delete(name); applyFilters(); renderChips(); updateStep3(); }
+function updateStep3() {
+  const n = selectedPlayers.size;
+  const s3 = document.getElementById('step3'); const btn = document.getElementById('btnGen');
+  if (n > 0) { s3.style.opacity = '1'; s3.style.pointerEvents = 'auto'; document.getElementById('num3').className = 'step-num active'; btn.disabled = false; btn.textContent = `Generar ${n === 1 ? '1 informe' : n + ' informes'} con IA`; }
+  else { s3.style.opacity = '0.4'; s3.style.pointerEvents = 'none'; document.getElementById('num3').className = 'step-num'; btn.disabled = true; btn.textContent = 'Generar informes con IA'; }
+}
+
+// METRICS
+function extractMetrics(raw) {
+  function getVal(keys) { const col = Object.keys(raw).find(c => keys.some(k => normalize(c).includes(k))); return col ? (parseFloat(raw[col]) || 0) : 0; }
+  const partidos = getVal(COL_KEYS.partidos), minutos = getVal(COL_KEYS.minutos);
+  const titular = getVal(COL_KEYS.titular), suplente = getVal(COL_KEYS.suplente);
+  const goles = getVal(COL_KEYS.goles), asistencias = getVal(COL_KEYS.asistencias);
+  const amarillas = getVal(COL_KEYS.amarillas), rojas = getVal(COL_KEYS.rojas);
+  const g90 = minutos > 0 ? goles / minutos * 90 : 0;
+  const a90 = minutos > 0 ? asistencias / minutos * 90 : 0;
+  const participaciones = goles + asistencias;
+  const minPorPJ = partidos > 0 ? minutos / partidos : 0;
+  const pctTitular = partidos > 0 ? titular / partidos * 100 : 0;
+  return { partidos, minutos, titular, suplente, goles, asistencias, amarillas, rojas, g90, a90, participaciones, minPorPJ, pctTitular };
+}
+function buildAlertas(m) {
+  const a = [];
+  if (m.minutos > 2000) a.push({ tipo:'rojo', icon:'⚠️', title:'Carga de minutos elevada', msg:`Con ${m.minutos}' acumulados, riesgo de sobrecarga física. Valorar rotación preventiva.` });
+  if (m.g90 >= 0.5 && m.pctTitular < 60) a.push({ tipo:'verde', icon:'⭐', title:'Jugador a seguir — alto rendimiento con pocos minutos', msg:`${m.g90.toFixed(2)} goles/90' siendo suplente habitual. Muy por encima de la media.` });
+  if (m.amarillas >= 5) a.push({ tipo:'amber', icon:'🟨', title:'Perfil disciplinario a vigilar', msg:`${m.amarillas} tarjetas amarillas. Riesgo real de sanción en partidos clave.` });
+  if (m.goles >= 8 && m.minutos < 1400 && m.minutos > 0) a.push({ tipo:'verde', icon:'🚀', title:'Eficacia goleadora destacada', msg:`${m.goles} goles en menos de 1400 minutos. Ratio muy eficiente.` });
+  if (m.rojas >= 1) a.push({ tipo:'rojo', icon:'🟥', title:'Expulsión registrada esta temporada', msg:`${m.rojas} tarjeta${m.rojas > 1 ? 's rojas' : ' roja'}. Evaluar perfil disciplinario.` });
+  if (m.participaciones >= 15) a.push({ tipo:'verde', icon:'🏆', title:'Participación destacada en ataque', msg:`${m.participaciones} participaciones en gol (${m.goles}G + ${m.asistencias}A).` });
+  if (!a.length) a.push({ tipo:'verde', icon:'✓', title:'Sin alertas destacadas', msg:'Parámetros normales en todas las métricas monitorizadas.' });
+  return a;
+}
+function buildProyeccion(m) {
+  if (m.partidos < 5) return null;
+  const f = 34 / m.partidos;
+  return { goles: Math.round(m.goles * f), asistencias: Math.round(m.asistencias * f), minutos: Math.round(m.minutos * f), participaciones: Math.round(m.participaciones * f), amarillas: Math.round(m.amarillas * f) };
+}
+
+// RENDER
+function renderReport(name, container) {
+  const d = playerData[name]; const raw = d._raw;
+  const m = extractMetrics(raw); const alertas = buildAlertas(m); const proy = buildProyeccion(m);
+  const initials = name.split(' ').map(p => p[0]).filter(Boolean).slice(0,2).join('').toUpperCase();
+  const subline = [d.posicion, d.club].filter(Boolean).join(' · ') || 'Jugador';
+  const rid = 'r_' + Math.random().toString(36).slice(2);
+  const tipoLabel = currentType === 'club' ? '🏟️ Club' : '🤝 Agencia';
+
+  const card = document.createElement('div');
+  card.className = 'report-card';
+  card.innerHTML = `
+    <div class="report-header">
+      <div class="report-avatar">${initials}</div>
+      <div style="flex:1">
+        <div class="report-player-name">${name}</div>
+        <div class="report-player-meta">${[subline, d.edad ? d.edad + ' años' : ''].filter(Boolean).join(' · ')}</div>
+        ${d.posicion ? `<div class="report-pos-badge">${d.posicion.toUpperCase()}</div>` : ''}
+      </div>
+      <div class="report-type-badge">${tipoLabel}</div>
+    </div>
+    <div class="report-body">
+      <div class="alertas">${alertas.map(a => `<div class="alerta ${a.tipo}"><span class="alerta-icon">${a.icon}</span><div><div class="alerta-title">${a.title}</div>${a.msg}</div></div>`).join('')}</div>
+      <div class="kpi-grid">
+        <div class="kpi-box"><div class="kpi-val">${m.minutos > 0 ? m.minutos + "'" : '—'}</div><div class="kpi-lbl">Minutos</div><div class="kpi-sub">${m.minPorPJ > 0 ? Math.round(m.minPorPJ) + "'/PJ" : ''}</div></div>
+        <div class="kpi-box"><div class="kpi-val">${m.partidos > 0 ? m.goles : '—'}</div><div class="kpi-lbl">Goles</div><div class="kpi-sub">${m.g90 > 0 ? m.g90.toFixed(2) + "/90'" : ''}</div></div>
+        <div class="kpi-box"><div class="kpi-val">${m.partidos > 0 ? m.asistencias : '—'}</div><div class="kpi-lbl">Asistencias</div><div class="kpi-sub">${m.participaciones > 0 ? m.participaciones + ' part.' : ''}</div></div>
+        <div class="kpi-box"><div class="kpi-val">${m.partidos > 0 ? m.partidos : '—'}</div><div class="kpi-lbl">Partidos</div><div class="kpi-sub">${m.pctTitular > 0 ? Math.round(m.pctTitular) + '% tit.' : ''}</div></div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-box"><div class="chart-box-title">Perfil del jugador</div><div class="chart-wrap"><canvas id="${rid}_radar"></canvas></div></div>
+        <div class="chart-box"><div class="chart-box-title">Rendimiento por 90 minutos</div><div class="chart-wrap"><canvas id="${rid}_bar"></canvas></div></div>
+      </div>
+      ${proy ? `<div class="proyeccion-box"><div class="proyeccion-title">🔮 Proyección fin de temporada (34 jornadas)</div><div class="proyeccion-grid"><div class="proy-item"><div class="proy-val">${proy.goles}</div><div class="proy-lbl">Goles</div></div><div class="proy-item"><div class="proy-val">${proy.asistencias}</div><div class="proy-lbl">Asistencias</div></div><div class="proy-item"><div class="proy-val">${proy.participaciones}</div><div class="proy-lbl">Participaciones</div></div><div class="proy-item"><div class="proy-val">${proy.minutos}'</div><div class="proy-lbl">Minutos totales</div></div><div class="proy-item"><div class="proy-val">${proy.amarillas}</div><div class="proy-lbl">Amarillas est.</div></div><div class="proy-item"><div class="proy-val">${m.partidos}</div><div class="proy-lbl">PJ actuales</div></div></div><div class="proy-note">* Proyección basada en ritmo actual de ${m.partidos} jornadas. Estimación orientativa.</div></div>` : ''}
+      <div class="scatter-box">
+        <div class="chart-box-title">Comparativa con el resto del archivo</div>
+        <div class="scatter-controls">
+          <label>Eje X <select id="${rid}_scX" onchange="buildScatter('${rid}','${name}')"><option value="minutos">Minutos</option><option value="partidos">Partidos</option><option value="amarillas">Amarillas</option></select></label>
+          <label>Eje Y <select id="${rid}_scY" onchange="buildScatter('${rid}','${name}')"><option value="goles">Goles</option><option value="asistencias">Asistencias</option><option value="participaciones">Participaciones</option></select></label>
+        </div>
+        <div class="scatter-wrap"><canvas id="${rid}_scatter"></canvas></div>
+      </div>
+      <div class="scatter-box">
+        <div class="chart-box-title">Jugador vs media del archivo</div>
+        <div style="position:relative;height:200px;"><canvas id="${rid}_vs"></canvas></div>
+      </div>
+    </div>`;
+  container.appendChild(card);
+  setTimeout(() => { buildRadar(rid, m); buildBar(rid, m); buildScatter(rid, name); buildVs(rid, name, m); }, 150);
+}
+
+function buildRadar(rid, m) {
+  new Chart(document.getElementById(rid + '_radar'), {
+    type: 'radar',
+    data: {
+      labels: ['Minutos','Goles','Asist.','Partidos','Disciplina'],
+      datasets: [{ data: [Math.min(100,Math.round(m.minutos/2500*100)), Math.min(100,Math.round(m.goles/20*100)), Math.min(100,Math.round(m.asistencias/12*100)), Math.min(100,Math.round(m.partidos/34*100)), Math.max(0,Math.round((1-m.amarillas/10)*100))], backgroundColor:'rgba(201,168,76,.15)', borderColor:'#c9a84c', borderWidth:2, pointBackgroundColor:'#e6c96a', pointRadius:3 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{r:{min:0,max:100,ticks:{display:false,color:'rgba(240,236,224,.3)'},grid:{color:'rgba(201,168,76,.1)'},pointLabels:{font:{size:10},color:'rgba(240,236,224,.6)'},angleLines:{color:'rgba(201,168,76,.1)'}}} }
+  });
+}
+function buildBar(rid, m) {
+  new Chart(document.getElementById(rid + '_bar'), {
+    type: 'bar',
+    data: { labels:["G/90'","A/90'",'Part.','% Tit.'], datasets:[{data:[parseFloat(m.g90.toFixed(2)),parseFloat(m.a90.toFixed(2)),m.participaciones,parseFloat((m.pctTitular/100).toFixed(2))], backgroundColor:['#c9a84c','#22c55e','#f97316','#a78bfa'], borderRadius:6, borderSkipped:false}] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.04)'},ticks:{font:{size:10},color:'rgba(240,236,224,.5)'}},x:{grid:{display:false},ticks:{font:{size:10},color:'rgba(240,236,224,.5)'}}} }
+  });
+}
+function buildScatter(rid, playerName) {
+  const xKey = document.getElementById(rid + '_scX').value;
+  const yKey = document.getElementById(rid + '_scY').value;
+  const getXY = raw => { const m = extractMetrics(raw); return { x: m[xKey]||0, y: m[yKey]||0 }; };
+  const others = allPlayers.filter(n => n !== playerName).slice(0,120).map(n => ({ ...getXY(playerData[n]._raw), label:n }));
+  const mine = getXY(playerData[playerName]._raw);
+  const prev = scatterInstances[rid]; if (prev) prev.destroy();
+  scatterInstances[rid] = new Chart(document.getElementById(rid + '_scatter'), {
+    type: 'scatter',
+    data: { datasets: [{ label:'Otros jugadores', data:others, backgroundColor:'rgba(201,168,76,.2)', borderColor:'rgba(201,168,76,.4)', pointRadius:4, pointHoverRadius:6 }, { label:playerName, data:[mine], backgroundColor:'#f97316', borderColor:'#ea6c00', pointRadius:9, pointHoverRadius:11 }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{font:{size:10},color:'rgba(240,236,224,.6)',boxWidth:10}},tooltip:{callbacks:{label:ctx=>{ const p=ctx.raw; const lbl=ctx.datasetIndex===1?playerName:(others[ctx.dataIndex]?.label||''); return `${lbl}: ${xKey} ${p.x}, ${yKey} ${p.y}`;}}}}, scales:{x:{title:{display:true,text:xKey,font:{size:10},color:'rgba(240,236,224,.5)'},grid:{color:'rgba(255,255,255,.04)'},ticks:{font:{size:10},color:'rgba(240,236,224,.4)'}},y:{title:{display:true,text:yKey,font:{size:10},color:'rgba(240,236,224,.5)'},grid:{color:'rgba(255,255,255,.04)'},ticks:{font:{size:10},color:'rgba(240,236,224,.4)'}}} }
+  });
+}
+
+function buildVs(rid, playerName, m) {
+  const metrics = ['goles','asistencias','participaciones','minutos','partidos'];
+  const labels = ['Goles','Asistencias','Participaciones','Minutos','Partidos'];
+
+  const others = allPlayers.filter(n => n !== playerName);
+  const avgs = metrics.map(key => {
+    if (!others.length) return 0;
+    const sum = others.reduce((acc, n) => acc + (extractMetrics(playerData[n]._raw)[key] || 0), 0);
+    return parseFloat((sum / others.length).toFixed(1));
+  });
+  const playerVals = metrics.map(key => m[key] || 0);
+
+  new Chart(document.getElementById(rid + '_vs'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: playerName, data: playerVals, backgroundColor: '#c9a84c', borderRadius: 5, borderSkipped: false },
+        { label: 'Media del archivo', data: avgs, backgroundColor: 'rgba(255,255,255,.15)', borderRadius: 5, borderSkipped: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, color: 'rgba(240,236,224,.6)', boxWidth: 10 } } },
+      scales: {
+        x: { beginAtZero: true, grid: { color: 'rgba(255,255,255,.04)' }, ticks: { font: { size: 10 }, color: 'rgba(240,236,224,.4)' } },
+        y: { grid: { display: false }, ticks: { font: { size: 10 }, color: 'rgba(240,236,224,.6)' } }
+      }
+    }
+  });
+}
+
+// GENERATE
+async function generarInformes() {
+  const btn = document.getElementById('btnGen');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Generando...';
+  const container = document.getElementById('reportsSection');
+  container.innerHTML = '';
+  Array.from(selectedPlayers).forEach(name => renderReport(name, container));
+  document.getElementById('num3').textContent = '✓';
+  document.getElementById('num3').className = 'step-num done';
+  btn.disabled = false;
+  btn.textContent = `Generar ${selectedPlayers.size === 1 ? '1 informe' : selectedPlayers.size + ' informes'} con IA`;
+  container.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+</script>
+</body>
+</html>
